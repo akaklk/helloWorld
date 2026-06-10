@@ -73,6 +73,10 @@ iptables -I INPUT -p tcp --dport ${REALITY_PORT} -j ACCEPT 2>/dev/null || true
 
 systemctl restart xray
 
+# 生成 VLESS 链接
+REMARK=$(echo "akaklk-Reality" | sed 's/ /%20/g')
+VLESS_LINK="vless://${OLD_UUID}@107.173.155.90:${REALITY_PORT}?encryption=none&flow=xtls-rprx-vision&security=reality&sni=${DEST_SITE}&fp=chrome&pbk=${PUBLIC_KEY}&sid=${SHORT_ID}&type=tcp&headerType=none#${REMARK}"
+
 echo ""
 echo "=========================================="
 echo "  Reality Node Ready"
@@ -88,5 +92,25 @@ echo "  Finger:   chrome"
 echo "  Public:   ${PUBLIC_KEY}"
 echo "  ShortId:  ${SHORT_ID}"
 echo ""
+echo "  VLESS Link:"
+echo "  ${VLESS_LINK}"
+echo ""
 echo "  VMess (CF) still on port 443"
 echo "=========================================="
+
+# 保存信息
+cat > /root/reality-info.txt << SAVEINFO
+Protocol: vless
+Address:  107.173.155.90
+Port:     ${REALITY_PORT}
+UUID:     ${OLD_UUID}
+Flow:     xtls-rprx-vision
+Security: reality
+SNI:      ${DEST_SITE}
+Finger:   chrome
+Public:   ${PUBLIC_KEY}
+ShortId:  ${SHORT_ID}
+
+VLESS Link:
+${VLESS_LINK}
+SAVEINFO
